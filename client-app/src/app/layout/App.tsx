@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import { Header, Icon, List } from 'semantic-ui-react'
-import './App.css';
 import Axios from 'axios';
 
 class  App extends Component {
 
   state = {
-    values: []
+    activities: []
   }
 
   componentDidMount() {
@@ -14,8 +13,8 @@ class  App extends Component {
     //   values: [{id:1, name:"Value 101"}, {id:2, name:"Value 202"}]
     // })
 
-    Axios.get("http://localhost:5000/api/values").then(result => {
-      this.setState({values: result.data })
+    Axios.get("http://localhost:5000/api/activities").then(result => {
+      this.setState({activities: result.data })
     }) 
     
   }
@@ -30,8 +29,8 @@ class  App extends Component {
         </Header>
         <List>
         {
-          this.state.values.map((value:any) => 
-            (<List.Item key={value.id}>{value.name}</List.Item>)
+          this.state.activities.map((activity:any) => 
+            (<List.Item key={activity.id}>{activity.title}</List.Item>)
             )
         }
         </List>
