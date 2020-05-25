@@ -43,7 +43,7 @@ class ActivityStore {
       
     } catch (error) {
       runInAction("loading activities error", () => {
-        console.error();
+        console.log(error);
         this.loadingInitial = false;
       });
     }
@@ -61,7 +61,7 @@ class ActivityStore {
         this.loadingInitial = true;
         activity = await agent.Activities.details(id);
 
-        runInAction("loading activity", () => {
+        runInAction("getting activity", () => {
           if (activity) {
             this.activity = activity;
           }
@@ -69,10 +69,10 @@ class ActivityStore {
           this.loadingInitial = false;
         });
       } catch (error) {
-        runInAction("loading activity error", () => {
+        runInAction("get activity error", () => {
           this.loadingInitial = false;
-        });
-        console.error();
+          console.log(error);
+        });                
       }
     }
   };
@@ -92,7 +92,7 @@ class ActivityStore {
     } catch (error) {
       runInAction(() => {
         this.submitting = false;
-        console.error();
+        console.log(error);
       });
     }
   };
@@ -108,7 +108,7 @@ class ActivityStore {
       });
     } catch (error) {
       runInAction(() => {
-        console.error();
+        console.log(error);
         this.submitting = false;
       });
     }
@@ -132,7 +132,7 @@ class ActivityStore {
       runInAction(() => {
         this.submitting = false;
         this.target = "";
-        console.error();
+        console.log(error);
       });
     }
   };

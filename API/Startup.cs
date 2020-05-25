@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
+using FluentValidation.AspNetCore;
+using Application.Activities;
+using API.Middleware;
 
 namespace API
 {
@@ -38,17 +33,20 @@ namespace API
             });
 
             services.AddMediatR(typeof(Application.Activities.List).Assembly);
-
-            services.AddControllers();
+            services.AddControllers()
+            .AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<Create>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            // if (env.IsDevelopment())
+            // {
+            //     //app.UseDeveloperExceptionPage();
+            // }
+
+            //Use own error handling
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             //app.UseHttpsRedirection();
 
