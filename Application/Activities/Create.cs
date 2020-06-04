@@ -1,24 +1,26 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistance;
 
 namespace Application.Activities
 {
     public class Create
     {
-        public class Command : IRequest 
+        public class Command : IRequest
         {
-            public Guid Id {get;set;}
-            public string Title {get;set;}
-            public string Description {get;set;}
-            public string Category {get;set;}
-            public DateTime Date {get;set;}
-            public string City {get;set;}
-            public string Venue {get;set;}
+            public Guid Id { get; set; }
+            public string Title { get; set; }
+            public string Description { get; set; }
+            public string Category { get; set; }
+            public DateTime Date { get; set; }
+            public string City { get; set; }
+            public string Venue { get; set; }
         }
 
         public class CommandValidator : AbstractValidator<Command>
@@ -37,15 +39,18 @@ namespace Application.Activities
         public class Handler : IRequestHandler<Command>
         {
             private readonly DataContext _context;
+            private readonly IUserAccessor _userAccessor;
 
-            public Handler(DataContext context)
+            public Handler(DataContext context, IUserAccessor userAccessor)
             {
+                _userAccessor = userAccessor;
                 _context = context;
             }
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                var activity = new Activity{
+                var activity = new Activity
+                {
                     Id = request.Id,
                     Title = request.Title,
                     Description = request.Description,
@@ -57,9 +62,20 @@ namespace Application.Activities
 
                 _context.Activities.Add(activity);
 
+                var user = await _context.Users.SingleOrDefaultAsync(c => c.UserName == _userAccessor.GetCurrentUserName());
+
+                var attendee = new UserActivity() {
+                    AppUser = user,
+                    Activity = activity,
+                    IsHost = true,
+                    DateJoined = DateTime.Now
+                };
+
+                _context.UserActivities.Add(attendee);
+
                 var result = await _context.SaveChangesAsync();
 
-                if(result > 0) return Unit.Value;
+                if (result > 0) return Unit.Value;
 
                 throw new Exception("Problem saving changes");
             }

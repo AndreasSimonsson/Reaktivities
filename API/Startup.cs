@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using AutoMapper;
 
 namespace API
 {
@@ -32,9 +33,10 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<Persistance.DataContext>(
-                opt => opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
-            );
+            services.AddDbContext<Persistance.DataContext>(opt => {
+                opt.UseLazyLoadingProxies();
+                opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             services.AddCors(opt =>
             {
@@ -45,6 +47,8 @@ namespace API
             });
 
             services.AddMediatR(typeof(Application.Activities.List).Assembly);
+
+            services.AddAutoMapper(typeof(List.Handler));
 
             services.AddControllers(opt=>{
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
@@ -70,6 +74,16 @@ namespace API
                     ValidateIssuer = false
                 };
             });
+
+            services.AddAuthorization(opt => {
+                opt.AddPolicy("IsActivityHost", policy => {
+                    var mustBeHost = true;
+                    policy.Requirements.Add(new IsHostRequirement(mustBeHost));
+                });
+            });
+
+            services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
+            // services.AddScoped<IAuthorizationHandler, IsHostRequirementHandler>();
 
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IUserAccessor, UserAccessor>();
