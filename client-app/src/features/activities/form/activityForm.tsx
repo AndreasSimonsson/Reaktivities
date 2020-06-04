@@ -143,7 +143,7 @@ const ActivityForm: React.FC<RouteComponentProps<IParamDetails>> = ({
                   }
                   disabled={loading}
                   floated="right"
-                  type="submit"
+                  type="button"
                   content="Cancel"
                 />
               </Form>

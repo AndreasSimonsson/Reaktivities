@@ -7,6 +7,20 @@ export interface IActivity
     date: Date;
     city: string;
     venue: string;
+    
+    // for currently logged in user
+    isGoing: boolean;
+    isHost: boolean;
+
+    attendees: IAttendee[];
+}
+
+export interface IAttendee
+{
+    username: string;
+    displayName: string;
+    image: string;
+    isHost: boolean;
 }
 
 export interface IActivityFormValues extends Partial<IActivity>
