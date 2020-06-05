@@ -21,11 +21,12 @@ interface IParamDetails {
 const validate = combineValidators ({
   title: isRequired({message: 'Event title is required!'}),
   category: isRequired('Category'),
-  desctiption: composeValidators(
-    isRequired('Description'),
-    hasLengthGreaterThan(4)({message:'Description must be at leat 5 characters'})
-  )(),
-  city: isRequired('City'),
+  // desctiption: composeValidators(
+  //   isRequired('Description'),
+  //   hasLengthGreaterThan(4)({message:'Description must be at leat 5 characters'})
+  // )(),
+  description: isRequired('Description'),
+    city: isRequired('City'),
   venue: isRequired('Venue'),
   date: isRequired('Date'),
   time: isRequired('Time')
