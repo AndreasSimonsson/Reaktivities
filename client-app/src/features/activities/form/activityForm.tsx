@@ -11,7 +11,7 @@ import SelectInput from "../../../app/common/form/SelectInput";
 import { category } from "../options/categoryOptions";
 import DateInput from "../../../app/common/DateInput";
 import { combineDateAndTime } from "../../../app/common/util/util";
-import {combineValidators, isRequired, composeValidators, hasLengthGreaterThan} from "revalidate";
+import {combineValidators, isRequired} from "revalidate";
 import { RootStoreContext } from "../../../app/stores/rootStore";
 
 interface IParamDetails {
