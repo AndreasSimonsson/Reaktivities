@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using AutoMapper;
 using Infrastructure.Photos;
+using System.Threading.Tasks;
+using API.SignalR;
 
 namespace API
 {
@@ -43,7 +45,7 @@ namespace API
             {
                 opt.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000").AllowCredentials();
                 });
             });
 
@@ -74,6 +76,21 @@ namespace API
                     ValidateAudience = false,
                     ValidateIssuer = false
                 };
+
+                //Make sure that SignalR gets the user token from the HTTP context
+                opt.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context => 
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/chat")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             services.AddAuthorization(opt => {
@@ -82,6 +99,8 @@ namespace API
                     policy.Requirements.Add(new IsHostRequirement(mustBeHost));
                 });
             });
+
+            services.AddSignalR();
 
             services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
             // services.AddScoped<IAuthorizationHandler, IsHostRequirementHandler>();
@@ -114,6 +133,7 @@ namespace API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat");
             });
         }
     }

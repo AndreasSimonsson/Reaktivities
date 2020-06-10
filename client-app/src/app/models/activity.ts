@@ -7,12 +7,23 @@ export interface IActivity
     date: Date;
     city: string;
     venue: string;
+    comments: IComment[];
     
     // for currently logged in user
     isGoing: boolean;
     isHost: boolean;
 
     attendees: IAttendee[];
+}
+
+export interface IComment
+{
+    id: string,
+    createdAt: string,
+    username: string,
+    body: string,
+    displayName: string,
+    image: string
 }
 
 export interface IAttendee
